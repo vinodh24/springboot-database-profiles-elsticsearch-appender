@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+    <property name="DEV_HOME" value="logs" />
+	<springProperty name="logpath" source="elasticsearch.log.path" defaultValue="myLogFile" />
+	<springProperty name="indextype" source="app.index.type" defaultValue="indextype" />
+	<springProperty name="elasticurl" source="app.elasticsearch.url" defaultValue="elasticurl" />
+	
+	<appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{ISO8601}" %-5p [%c{3}"] \(%t:%X{}"\) %m%n</Pattern>
+		</layout>
+	</appender>
+
+	<appender name="ELASTIC" class="com.internetitem.logback.elasticsearch.ElasticsearchAppender">
+		<url>http://127.0.0.1:9200/_bulk</url>
+		<index>elastic-search</index>
+		<type>String</type>
+		<loggerName>es-logger</loggerName>
+		<errorLoggerName>es-error-logger</errorLoggerName>
+		<connectTimeout>30000</connectTimeout>
+		<errorsToStderr>false</errorsToStderr>
+		<includeCallerData>false</includeCallerData>
+		<logsToStderr>false</logsToStderr>
+		<maxQueueSize>104857600</maxQueueSize>
+		<maxRetries>3</maxRetries>
+		<readTimeout>30000</readTimeout>
+		<sleepTime>250</sleepTime>
+		<rawJsonMessage>false</rawJsonMessage>
+		<includeMdc>true</includeMdc>
+		<authentication class="com.internetitem.logback.elasticsearch.config.BasicAuthentication" />
+		<properties>
+			<property>
+				<name>host</name>
+				<value>localhost</value>
+				<allowEmpty>false</allowEmpty>
+			</property>
+			<property>
+				<name>severity</name>
+				<value>%level</value>
+			</property>
+			<property>
+				<name>thread</name>
+				<value>%thread</value>
+			</property>
+			<property>
+				<name>stacktrace</name>
+				<value>%ex</value>
+			</property>
+			<property>
+				<name>logger</name>
+				<value>%logger</value>
+			</property>
+			<property>
+				<name>uniqueRequestId</name>
+				<value>%X{uniqueRequestId}</value>
+			</property>
+		</properties>
+		<headers>
+			<header>
+				<name>Content-Type</name>
+				<value>application/json</value>
+			</header>
+		</headers>
+	</appender>
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${DEV_HOME}/elastic-search-log.log</file>
+		<append>true</append>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${DEV_HOME}/elastic-search-log.log.%d{yyyy-MM-dd}_%i.gz
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>100MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<maxHistory>10</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{ISO8601}" %-5p [%c{3}"] \(%t:%X{}"\) %m%n</pattern>
+		</encoder>
+	</appender>
+	<logger name="es-logger" level="ERROR"/>
+	<root name="com.vinodh" level="info" additivity="false">
+		<appender-ref ref="ELASTIC" />
+		<appender-ref ref="FILE" />
+	</root>
+</configuration>

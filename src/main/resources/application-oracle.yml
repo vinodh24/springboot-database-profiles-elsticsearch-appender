@@ -1,0 +1,24 @@
+db:
+  active:
+    ipaddress: XXXX 
+  database: XXXX
+  port: 1521
+  username: XXXX
+  password: XXXX
+ 
+spring:
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@${db.active.ipaddress}:${db.port}/${db.database}
+    username: ${db.username}
+    password: ${db.password}
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+         dialect: org.hibernate.dialect.Oracle9Dialect
+
+ 
+
